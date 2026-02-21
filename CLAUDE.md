@@ -468,3 +468,25 @@ Markdown files in `operating_system/` support a `{{filepath}}` include syntax, p
 - **Missing files**: If a referenced file doesn't exist, the pattern is left as-is
 
 Currently used by the Event Handler to load CHATBOT.md (which includes CLAUDE.md) as the Claude system prompt.
+
+---
+
+## Speed Mode: Work From Anywhere (Pope's Process)
+
+**Push before switching devices.** GitHub = resume point from phone or Claude Cloud.
+
+```bash
+# Start every session
+git checkout -b feature/[what-youre-building]   # Feature branch isolates work
+claude --dangerously-skip-permissions            # No Bash approval prompts
+
+# Push to resume from anywhere
+git add . && git commit -m "WIP: [desc]" && git push origin HEAD
+```
+
+Resume: Claude mobile → Code tab. Or "Open in CLI" on Claude web → paste in terminal.
+
+**SAFE for:** File edits, npm installs, git operations, Docker builds, config changes
+**NOT safe for:** Exposing secrets/API keys, destructive git ops (force-push to main), `rm -rf`
+
+**Reference:** `Claude Factory Skills Shared/skills/saas-machine/SKILL.md` → Speed Mode section
