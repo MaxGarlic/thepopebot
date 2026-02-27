@@ -490,3 +490,29 @@ Resume: Claude mobile → Code tab. Or "Open in CLI" on Claude web → paste in 
 **NOT safe for:** Exposing secrets/API keys, destructive git ops (force-push to main), `rm -rf`
 
 **Reference:** `Claude Factory Skills Shared/skills/saas-machine/SKILL.md` → Speed Mode section
+
+
+---
+
+## Garlic Resources
+
+**Products, websites, books, terminology:** `/Users/iangarlic/Claude Factory Skills Shared/GARLIC-RESOURCES.md`
+**Full glossary:** `/Users/iangarlic/Desktop/Claude Code/garlic-command-center/GLOSSARY.md`
+
+
+---
+
+## Chat Close-Out (UNIVERSAL)
+
+**Triggers:** `/close`, "close this out", "close this chat"
+
+Run at the end of every project chat — no exceptions.
+
+1. Summarize what was built/decided (3 bullets max)
+2. Update MEMORY.md with anything new
+3. Check if PROJECT.md needs updating
+4. Git reminder: `git add . && git commit -m "WIP: [desc]" && git push origin HEAD`
+5. "Next session: pick up at [X]"
+
+**Full routine:** `/Users/iangarlic/Desktop/Claude Code/garlic-command-center/.claude/skills/friday-manager/SKILL.md` → `/close`
+
