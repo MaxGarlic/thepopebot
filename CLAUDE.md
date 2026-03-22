@@ -2,6 +2,21 @@
 
 This document explains the thepopebot codebase for AI assistants working on this project.
 
+## Writing Style (NON-NEGOTIABLE)
+
+All documents, emails, content, reports, code comments:
+
+- **No em-dashes.** Colon or comma instead
+- **No emojis** unless explicitly requested
+- **Short over long:** bullets, not paragraphs; brief, not dense
+- **No decorative dividers** (horizontal --- lines) inside documents or content
+- **No AI filler:** "Certainly!", "Absolutely!", "Great question!", "I'd be happy to", "As an AI", "In conclusion", "Let's dive in", "Seamlessly", "Game-changer", "Leverage/Utilize" (say "use"), "It's worth noting", "Transformative", "Revolutionary"
+- **No sycophancy:** don't validate or flatter, just answer
+- **No rhetorical questions** as openers or filler
+- **Active voice,** not passive
+
+---
+
 ## What is thepopebot?
 
 thepopebot is a **template repository** for creating custom autonomous AI agents. It features a two-layer architecture: an Event Handler for orchestration (webhooks, Telegram chat, cron scheduling) and a Docker Agent for autonomous task execution via the Pi coding agent.
@@ -499,6 +514,24 @@ Resume: Claude mobile → Code tab. Or "Open in CLI" on Claude web → paste in 
 **Products, websites, books, terminology:** `/Users/iangarlic/Claude Factory Skills Shared/GARLIC-RESOURCES.md`
 **Full glossary:** `/Users/iangarlic/Desktop/Claude Code/garlic-command-center/GLOSSARY.md`
 
+
+---
+
+## Obsidian Vault (Knowledge Base)
+
+**Vault root:** `/Users/iangarlic/Desktop/Claude Code/` (all repos visible)
+**Primary ops folder:** `garlic-command-center/`
+
+**Best Practices:**
+- Capture ideas with `/capture [text]` or `/idea [text]`
+- Log conversations at session end with `/log`
+- Client notes go in `garlic-command-center/Clients/`
+- Writing pipeline: `/idea` -> `/draft` -> `/polish` -> `/publish` (pushes to Google Docs)
+- To-dos: `/todo [sales|content|build|tamos|admin] [task]`
+- Search vault: `/find [query]`
+- All files are markdown in git, Obsidian renders them, Claude Code reads/writes them
+- Do NOT create Apple Notes or Evernote notes. Obsidian is the single system.
+- Skill: `garlic-command-center/.claude/skills/obsidian-vault/SKILL.md`
 
 ---
 
