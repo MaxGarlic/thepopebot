@@ -16,8 +16,19 @@ RUN TPB_VERSION=$(node -p "require('./package.json').version") && \
 # Overlays our custom lib/ and drizzle/ on top of the npm-installed thepopebot
 # package so bucket/summary patches apply to both server-side code and the
 # Next.js build (since web/ imports from 'thepopebot/*' which resolves to node_modules).
+#
+# Gotcha: the published npm package ships BOTH pre-compiled .js and source .jsx.
+# Webpack/Next resolves imports like './sidebar-history.js' literally, so after
+# overlaying .jsx we must also regenerate the matching .js via esbuild (same
+# command the repo's own `npm run build` uses). Otherwise our .jsx changes
+# would be ignored at build time.
 COPY lib/ ./node_modules/thepopebot/lib/
 COPY drizzle/ ./node_modules/thepopebot/drizzle/
+RUN cd ./node_modules/thepopebot && \
+    npx --yes esbuild lib/chat/components/*.jsx lib/chat/components/**/*.jsx --outdir=lib/chat/components --format=esm --jsx=automatic --outbase=lib/chat/components --log-level=warning && \
+    npx --yes esbuild lib/auth/components/*.jsx lib/auth/components/**/*.jsx --outdir=lib/auth/components --format=esm --jsx=automatic --outbase=lib/auth/components --log-level=warning && \
+    npx --yes esbuild lib/code/*.jsx --outdir=lib/code --format=esm --jsx=automatic --log-level=warning && \
+    npx --yes esbuild lib/cluster/components/*.jsx --outdir=lib/cluster/components --format=esm --jsx=automatic --log-level=warning
 
 # ── Stage 2: Next.js build ───────────────────────────────────────
 FROM node:22-bookworm-slim AS nextjs
