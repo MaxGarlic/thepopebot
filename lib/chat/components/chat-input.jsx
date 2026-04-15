@@ -119,6 +119,40 @@ export function ChatInput({ input, setInput, onSubmit, status, stop, files, setF
     if (e) e.preventDefault();
     if (disabled || (!input.trim() && !partialText.trim() && files.length === 0) || isStreaming) return;
     if (canSendOverride !== undefined && !canSendOverride) return;
+
+    // Handle /save command — intercepts before the message is sent to the LLM.
+    // Extracts chatId from current URL path (/chat/[id]).
+    const trimmed = (input || '').trim();
+    if (trimmed === '/save' || trimmed.startsWith('/save ')) {
+      const match = typeof window !== 'undefined' ? window.location.pathname.match(/\/chat\/([^/]+)/) : null;
+      const chatId = match?.[1];
+      if (!chatId) {
+        window.alert('/save only works inside an existing chat (send at least one message first).');
+        setInput('');
+        return;
+      }
+      setInput('');
+      (async () => {
+        try {
+          const res = await fetch(`/chat/${chatId}/save-summary`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ trigger: 'manual' }),
+          });
+          const data = await res.json();
+          if (data.success) {
+            const where = data.vaultWritten ? `AREAS/${data.vaultPath}` : '(no vault path set — DB only)';
+            window.alert(`Summary saved.\n\n${where}\n\nPreview:\n${(data.summary || '').slice(0, 200)}…`);
+          } else {
+            window.alert(`/save failed: ${data.error || 'unknown error'}`);
+          }
+        } catch (err) {
+          window.alert(`/save failed: ${err.message}`);
+        }
+      })();
+      return;
+    }
+
     if (partialText) {
       const needsSpace = input && !input.endsWith(' ');
       setInput(input + (needsSpace ? ' ' : '') + partialText);

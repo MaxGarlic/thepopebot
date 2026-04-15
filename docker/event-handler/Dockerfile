@@ -12,6 +12,13 @@ RUN TPB_VERSION=$(node -p "require('./package.json').version") && \
     echo "{\"private\":true}" > package.json && \
     npm install --no-save "thepopebot@${TPB_VERSION}" tailwindcss @tailwindcss/postcss
 
+# OVERRIDE: bake in local source changes from the feature branch.
+# Overlays our custom lib/ and drizzle/ on top of the npm-installed thepopebot
+# package so bucket/summary patches apply to both server-side code and the
+# Next.js build (since web/ imports from 'thepopebot/*' which resolves to node_modules).
+COPY lib/ ./node_modules/thepopebot/lib/
+COPY drizzle/ ./node_modules/thepopebot/drizzle/
+
 # ── Stage 2: Next.js build ───────────────────────────────────────
 FROM node:22-bookworm-slim AS nextjs
 WORKDIR /app

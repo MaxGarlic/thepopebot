@@ -9,6 +9,20 @@ import { cn } from '../utils.js';
 import { AgentIcon, CodeIcon, MessageIcon } from './icons.js';
 
 
+// Preferred bucket display order. Anything not in this list appears after these, sorted alphabetically.
+// 'general' (the default/unbucketed chats) always goes last.
+const BUCKET_ORDER = [
+  'CLIENTS',
+  'SALES',
+  'MARKETING',
+  'CONTENT',
+  'TRUSTED-AUTHORITY',
+  'TAMOS',
+  'SAAS',
+  'OPS',
+  'AI',
+];
+
 function groupChatsByDate(chats) {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -45,6 +59,52 @@ function groupChatsByDate(chats) {
   }
 
   return groups;
+}
+
+/**
+ * Group chats by bucket, ordered by BUCKET_ORDER then alphabetical.
+ * Starred chats get their own top group regardless of bucket.
+ */
+function groupChatsByBucket(chats) {
+  const groups = {};
+  const starred = [];
+
+  for (const chat of chats) {
+    if (chat.starred) {
+      starred.push(chat);
+      continue;
+    }
+    const bucket = chat.bucket || 'general';
+    if (!groups[bucket]) groups[bucket] = [];
+    groups[bucket].push(chat);
+  }
+
+  // Sort each group by updatedAt desc
+  for (const bucket of Object.keys(groups)) {
+    groups[bucket].sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+  }
+
+  // Build ordered output
+  const ordered = {};
+  if (starred.length > 0) {
+    starred.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+    ordered['⭐ Starred'] = starred;
+  }
+  for (const name of BUCKET_ORDER) {
+    if (groups[name] && groups[name].length > 0) {
+      ordered[name] = groups[name];
+      delete groups[name];
+    }
+  }
+  // Any other user-defined buckets, alphabetical
+  const remaining = Object.keys(groups).filter((k) => k !== 'general').sort();
+  for (const name of remaining) {
+    ordered[name] = groups[name];
+  }
+  if (groups.general && groups.general.length > 0) {
+    ordered.general = groups.general;
+  }
+  return ordered;
 }
 
 const BASE_FILTERS = [
@@ -219,7 +279,7 @@ export function SidebarHistory() {
   const filteredChats = !filter || filter === 'all' ? chats
     : filter === 'code' ? chats.filter(isCodeChat)
     : chats.filter((c) => !isCodeChat(c));
-  const grouped = groupChatsByDate(filteredChats);
+  const grouped = groupChatsByBucket(filteredChats);
 
   const hasResults = Object.values(grouped).some((g) => g.length > 0);
 
