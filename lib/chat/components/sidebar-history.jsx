@@ -63,6 +63,7 @@ function groupChatsByDate(chats) {
 
 /**
  * Group chats by bucket, ordered by BUCKET_ORDER then alphabetical.
+ * Always shows ALL 9 buckets (even empty) so Ian can see the structure.
  * Starred chats get their own top group regardless of bucket.
  */
 function groupChatsByBucket(chats) {
@@ -84,17 +85,16 @@ function groupChatsByBucket(chats) {
     groups[bucket].sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
   }
 
-  // Build ordered output
+  // Build ordered output. Show ALL 9 buckets always, plus Starred/general.
   const ordered = {};
   if (starred.length > 0) {
     starred.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
     ordered['⭐ Starred'] = starred;
   }
   for (const name of BUCKET_ORDER) {
-    if (groups[name] && groups[name].length > 0) {
-      ordered[name] = groups[name];
-      delete groups[name];
-    }
+    // Always include, even if empty
+    ordered[name] = groups[name] || [];
+    delete groups[name];
   }
   // Any other user-defined buckets, alphabetical
   const remaining = Object.keys(groups).filter((k) => k !== 'general').sort();
@@ -291,28 +291,34 @@ export function SidebarHistory() {
         </SidebarGroupContent>
       </SidebarGroup>
       {hasResults ? (
-        Object.entries(grouped).map(
-          ([label, groupChats]) =>
-            groupChats.length > 0 && (
-              <SidebarGroup key={label} className="pt-1">
-                <SidebarGroupLabel>{label}</SidebarGroupLabel>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    {groupChats.map((chat) => (
-                      <SidebarHistoryItem
-                        key={chat.id}
-                        chat={chat}
-                        isActive={chat.id === activeChatId}
-                        onDelete={handleDelete}
-                        onStar={handleStar}
-                        onRename={handleRename}
-                      />
-                    ))}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
-            )
-        )
+        Object.entries(grouped).map(([label, groupChats]) => (
+          <SidebarGroup key={label} className="pt-1">
+            <SidebarGroupLabel>
+              {label}
+              {groupChats.length > 0 && (
+                <span className="ml-1.5 text-xs opacity-50">({groupChats.length})</span>
+              )}
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              {groupChats.length > 0 ? (
+                <SidebarMenu>
+                  {groupChats.map((chat) => (
+                    <SidebarHistoryItem
+                      key={chat.id}
+                      chat={chat}
+                      isActive={chat.id === activeChatId}
+                      onDelete={handleDelete}
+                      onStar={handleStar}
+                      onRename={handleRename}
+                    />
+                  ))}
+                </SidebarMenu>
+              ) : (
+                <p className="px-2 py-1 text-xs italic opacity-40">empty</p>
+              )}
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))
       ) : (
         <SidebarGroup>
           <SidebarGroupContent>
